@@ -60,7 +60,6 @@ public class UserService {
             // 비밀번호가 일치하지 않으면 실패
             return 0;
         }
-
         // 비밀번호가 일치하면 로그인 성공
         return 1;
     }

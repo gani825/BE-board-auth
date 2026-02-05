@@ -2,10 +2,9 @@ package com.green.boardauth.application.user;
 
 import com.green.boardauth.application.user.model.UserSignInReq;
 import com.green.boardauth.application.user.model.UserSignUpReq;
-
+import com.green.boardauth.configuration.model.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,7 +34,7 @@ public class UserController {
     // 회원가입 API
     // POST /api/user/signup
     @PostMapping("/signup")
-    public int signup(@RequestBody UserSignUpReq req) {
+    public ResultResponse<Integer> signup(@RequestBody UserSignUpReq req) {
 
         // 클라이언트에서 넘어온 회원가입 요청 데이터 로그 출력
         log.info("req : {}", req);
@@ -44,13 +43,13 @@ public class UserController {
         int result = userService.signUp(req);
 
         // 처리 결과를 그대로 응답
-        return result;
+        return new ResultResponse<>("회원가입 성공", result);
     }
 
     // 로그인 API
     // POST /api/user/signin
     @PostMapping("/signin")
-    public int signIn(@RequestBody UserSignInReq req) {
+    public ResultResponse<Integer> signIn(@RequestBody UserSignInReq req) {
 
         // 클라이언트에서 넘어온 로그인 요청 데이터 로그 출력
         log.info("req : {}", req);
@@ -59,6 +58,6 @@ public class UserController {
         int result = userService.signIn(req);
 
         // 로그인 성공 / 실패 결과 반환
-        return result;
+        return new ResultResponse<>(result == 1 ? "로그인 성공" : "로그인 실패", result);
     }
 }
