@@ -1,6 +1,7 @@
 package com.green.boardauth.application.user;
 
 import com.green.boardauth.application.user.model.UserSignInReq;
+import com.green.boardauth.application.user.model.UserSignInRes;
 import com.green.boardauth.application.user.model.UserSignUpReq;
 import com.green.boardauth.configuration.model.ResultResponse;
 import lombok.RequiredArgsConstructor;
@@ -49,15 +50,20 @@ public class UserController {
     // 로그인 API
     // POST /api/user/signin
     @PostMapping("/signin")
-    public ResultResponse<Integer> signIn(@RequestBody UserSignInReq req) {
+    public ResultResponse<?> signIn(@RequestBody UserSignInReq req) {
 
         // 클라이언트에서 넘어온 로그인 요청 데이터 로그 출력
         log.info("req : {}", req);
 
         // Service에 로그인 처리 위임
-        int result = userService.signIn(req);
+        UserSignInRes UserSignInRes = userService.signIn(req);
+
+        // 보안 쿠키 처리
+        if (UserSignInRes != null) {
+
+        }
 
         // 로그인 성공 / 실패 결과 반환
-        return new ResultResponse<>(result == 1 ? "로그인 성공" : "로그인 실패", result);
+        return new ResultResponse<>(UserSignInRes == null ? "로그인 성공" : "로그인 실패", UserSignInRes);
     }
 }

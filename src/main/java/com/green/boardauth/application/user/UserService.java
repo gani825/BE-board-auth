@@ -2,6 +2,7 @@ package com.green.boardauth.application.user;
 
 import com.green.boardauth.application.user.model.UserGetOneRes;
 import com.green.boardauth.application.user.model.UserSignInReq;
+import com.green.boardauth.application.user.model.UserSignInRes;
 import com.green.boardauth.application.user.model.UserSignUpReq;
 import com.green.boardauth.configuration.model.JwtUser;
 import com.green.boardauth.configuration.security.JwtTokenProvider;
@@ -46,7 +47,7 @@ public class UserService {
     }
 
     // 로그인 처리
-    public int signIn(UserSignInReq req) {
+    public UserSignInRes signIn(UserSignInReq req) {
 
         // 아이디(uid)를 기준으로 회원 정보 조회
         UserGetOneRes res = userMapper.findByUid(req.getUid());
@@ -58,11 +59,14 @@ public class UserService {
         // DB에 저장된 암호화된 비밀번호 비교
         if (!passwordEncoder.matches(req.getUpw(), res.getUpw())) {
             // 비밀번호가 일치하지 않으면 실패
-            return 0;
+            return null;
         }
         // 비밀번호가 일치하면 로그인 성공
         // 예전에는 AT, RT을 FE전달 >>> 보안 쿠키 이용
 
-        return 1;
+        return UserSignInRes.builder()
+                .signedUserId(res.getId())
+                .nm(res.getNm())
+                .build();
     }
 }
