@@ -3,10 +3,10 @@ package com.green.boardauth.application.user;
 import com.green.boardauth.application.user.model.UserGetOneRes;
 import com.green.boardauth.application.user.model.UserSignInReq;
 import com.green.boardauth.application.user.model.UserSignUpReq;
-
+import com.green.boardauth.configuration.model.JwtUser;
+import com.green.boardauth.configuration.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +61,8 @@ public class UserService {
             return 0;
         }
         // 비밀번호가 일치하면 로그인 성공
+        // 예전에는 AT, RT을 FE전달 >>> 보안 쿠키 이용
+
         return 1;
     }
 }
