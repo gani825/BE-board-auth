@@ -1,6 +1,7 @@
 package com.green.boardauth.configuration.util;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -19,5 +20,22 @@ public class MyCookieUtil {
             cookie.setPath(path);
         }
         res.addCookie(cookie);
+    }
+
+    public String getValue(HttpServletRequest req, String key) {
+        Cookie cookie = getCookie(req, key);
+        return cookie == null ? null : cookie.getValue();
+    }
+
+    public Cookie getCookie(HttpServletRequest req, String key) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null && cookies.length > 0) { // 쿠키에 뭐가 담겨져 있다면
+            for (Cookie c : cookies) {
+                if (c.getName().equals(key)) { // key 이름으로 담겨진 쿠키가 있니 ?
+                    return c;
+                }
+            }
+        }
+        return null;
     }
 }

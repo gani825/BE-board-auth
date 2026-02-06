@@ -3,7 +3,10 @@ package com.green.boardauth.application.user;
 import com.green.boardauth.application.user.model.UserSignInReq;
 import com.green.boardauth.application.user.model.UserSignInRes;
 import com.green.boardauth.application.user.model.UserSignUpReq;
+import com.green.boardauth.configuration.model.JwtUser;
 import com.green.boardauth.configuration.model.ResultResponse;
+import com.green.boardauth.configuration.security.JwtTokenManager;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,6 +34,7 @@ public class UserController {
     // 비즈니스 로직을 처리하는 Service
     // final → 생성자 주입
     private final UserService userService;
+    private final JwtTokenManager jwtTokenManager;
 
     // 회원가입 API
     // POST /api/user/signup
@@ -50,7 +54,7 @@ public class UserController {
     // 로그인 API
     // POST /api/user/signin
     @PostMapping("/signin")
-    public ResultResponse<?> signIn(@RequestBody UserSignInReq req) {
+    public ResultResponse<?> signIn(HttpServletResponse res, @RequestBody UserSignInReq req) {
 
         // 클라이언트에서 넘어온 로그인 요청 데이터 로그 출력
         log.info("req : {}", req);
@@ -60,10 +64,11 @@ public class UserController {
 
         // 보안 쿠키 처리
         if (UserSignInRes != null) {
-
+            JwtUser jwtUser = new JwtUser(UserSignInRes.getSignedUserId());
+            jwtTokenManager.issue(res, jwtUser);
         }
 
         // 로그인 성공 / 실패 결과 반환
-        return new ResultResponse<>(UserSignInRes == null ? "로그인 성공" : "로그인 실패", UserSignInRes);
+        return new ResultResponse<>(UserSignInRes == null ? "로그인 실패" : "로그인 성공", UserSignInRes);
     }
 }

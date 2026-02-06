@@ -1,21 +1,26 @@
 package com.green.boardauth.configuration.security;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 // 객체(Bean)를 직접 등록하는 용도
 // @Configuration 애노테이션 아래에 있는 @Bean은 무조건 싱글톤이다.
 // 스프링이 이 클래스를 읽어서 컨테이너 설정으로 사용함
 @Configuration
 
+@RequiredArgsConstructor
 // 스프링 시큐리티 관련 설정을 적는 클래스
 // → "보안은 이렇게 동작해" 라고 스프링에게 알려주는 역할
 public class WebSecurityConfiguration {
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     // 메서드 호출로 리턴한 값의 객체를 빈등록하게 된다.
     // 스프링이 직접 관리하도록 등록함
@@ -43,6 +48,15 @@ public class WebSecurityConfiguration {
                 .httpBasic(hb -> hb.disable()) // 시큐리티에서 제공해주는 로그이니 화면이 있는데 사용하지 않겠다.
                 .formLogin(fl -> fl.disable()) // 어차피 백엔드가 화면을 만들지 않기 때문에 폼로그인도 사용하지 않겠다/
                 .csrf(csrf -> csrf.disable()) // 어차피 백엔드가 화면을 만들지 않으면 csrf 공격이 의미가 없기 때문에 비활성화하겠다.
+
+                // 인증 / 인가처리 (권한처리)
+
+                // 아래 내용은 (POST) /api/board로 요청이 올 때는 반드시 로그인이 되어 있어야 한다.
+                .authorizeHttpRequests(req -> req.requestMatchers(HttpMethod.POST, "/api/auth/signin").authenticated()
+                        .anyRequest().permitAll() // 나머지 요청에 대해서는 허용하겠다.
+                )
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 // 위에서 적은 설정들을 실제로 적용 가능한 형태로 완성
                 .build();
 
