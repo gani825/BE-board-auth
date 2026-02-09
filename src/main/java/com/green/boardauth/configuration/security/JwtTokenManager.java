@@ -65,7 +65,9 @@ public class JwtTokenManager { //인증 처리 총괄
     //import org.springframework.security.core.Authentication;
     public Authentication getAuthentication(HttpServletRequest req) {
         String accessToken = getAccessTokenFromCookie(req); //AT를 쿠키에서 빼낸다.
-        if(accessToken == null) { return null; }
+        if (accessToken == null) {
+            return null;
+        }
         //쿠키에 AT이 있다. JWT에 담았던 JwtUser객체를 다시 빼낸다.
         JwtUser jwtUser = jwtTokenProvider.getJwtUserFromToken(accessToken);
         //import com.green.boardauth.configuration.model.UserPrincipal;
@@ -74,4 +76,16 @@ public class JwtTokenManager { //인증 처리 총괄
         return new UsernamePasswordAuthenticationToken(userPrincipal, null, userPrincipal.getAuthorities());
     }
 
+    public void deleteAccessTokenInCookie(HttpServletResponse res) {
+        myCookieUtil.deleteCookie(res, constJwt.getAccessTokenCookieName(), constJwt.getAccessTokenCookiePath());
+    }
+
+    public void deleteRefreshTokenInCookie(HttpServletResponse res) {
+        myCookieUtil.deleteCookie(res, constJwt.getRefreshTokenCookieName(), constJwt.getRefreshTokenCookiePath());
+    }
+
+    public void signOut(HttpServletResponse res) {
+        deleteAccessTokenInCookie(res);
+        deleteRefreshTokenInCookie(res);
+    }
 }

@@ -7,19 +7,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-
-// spring Security가 인증처리를 할 때 사용하는 객체
+//Spring Security가 인증처리를 할 때 사용하는 객체
 @RequiredArgsConstructor
 public class UserPrincipal implements UserDetails {
     private final JwtUser jwtUser;
 
-    public long getSingleUserId() {
-        return jwtUser.getSignedUserId();
-    }
-
     public long getSignedUserId() {
         return jwtUser.getSignedUserId();
     }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();
