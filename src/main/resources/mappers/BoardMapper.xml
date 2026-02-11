@@ -1,13 +1,56 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<!--이 mapper는 BoardMapper 인터페이스와 연결됨 namespace 값이 인터페이스의 풀패키지 경로와 같아야 함 -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.green.boardauth.application.board.BoardMapper">
-    <insert id="postBoard">
-            INSERT INTO board
-            (title, contents, user_id )
-            VALUES
-            ( #{title}, #{contents}, #{userId} )
+    <!-- useGeneratedKeys: insert하고 바로 pk값 가져오는 기능
+         keyProperty: pk값을 담을 멤버 필드명
+     -->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO board
+        SET title = #{title}
+        , contents = #{contents}
+        , user_id = #{userId}
     </insert>
+
+    <select id="findAll">
+        SELECT b.id, b.title, b.created_at, u.nm
+        FROM board b
+        INNER JOIN user u
+        ON u.id = b.user_id
+        <if test=" searchText != null and searchText != '' ">
+            WHERE b.title LIKE '%${searchText}%'
+            OR b.contents LIKE '%${searchText}%'
+        </if>
+        ORDER BY b.id DESC
+        LIMIT #{startIdx}, #{size}
+    </select>
+
+    <select id="findMaxPage">
+        SELECT ceil(COUNT(1) / #{size}) FROM board
+        <if test=" searchText != null and searchText != '' ">
+            WHERE title LIKE '%${searchText}%'
+            OR contents LIKE '%${searchText}%'
+        </if>
+    </select>
+
+    <select id="findById">
+        SELECT b.id, b.title, b.contents, b.created_at, b.user_id, u.nm
+        FROM board b
+        INNER JOIN user u
+        ON u.id = b.user_id
+        WHERE b.id = #{id}
+    </select>
+
+    <update id="modify">
+        UPDATE board
+        SET title = #{title}
+        , contents = #{contents}
+        WHERE id = #{id}
+        AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM board
+        WHERE id = #{id}
+        AND user_id = #{signedUserId}
+    </delete>
 </mapper>

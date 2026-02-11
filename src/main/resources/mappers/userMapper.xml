@@ -13,7 +13,7 @@
     </insert>
 
     <select id="findByUid">
-        SELECT id, uid, upw, nm, gender, created_at
+        SELECT id, uid, upw, nm, gender, created_at AS createdAt
         FROM user
         WHERE uid = #{uid}
     </select>
